@@ -1,115 +1,205 @@
-import { useAppStore, selectHasPendingSync } from '../../store/useAppStore';
-import type { Role } from '../../types';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { Badge } from '../ui/badge';
-import { Bell, Wifi, WifiOff, RefreshCcw } from 'lucide-react';
+// ============================================================
+// HEADER - Top bar with theme toggle, online/offline, notifications
+// ============================================================
+
+import { useState, useRef, useEffect } from 'react';
+import { useAppStore } from '../../store/useAppStore';
+import { cn, formatRelativeTime } from '../../utils';
+import { useTranslation } from '../../hooks/useTranslation';
+import {
+  Bell, Sun, Moon, Wifi, WifiOff, RefreshCcw,
+  CheckCheck, X, AlertTriangle, AlertCircle, Info, CheckCircle2,
+} from 'lucide-react';
 
 export function Header() {
-  const { language, setLanguage, role, setRole, isOnline, lastSyncTime, syncQueue } = useAppStore();
-  const hasPendingSync = useAppStore(selectHasPendingSync);
-  const pendingCount = syncQueue.filter(item => item.status === 'pending').length;
+  const {
+    theme, toggleTheme,
+    language, setLanguage,
+    isOnline, setOnlineStatus, lastSyncTime,
+    notifications, unreadCount, markNotificationRead, markAllNotificationsRead,
+    syncQueue, processSyncQueue,
+    currentUser,
+  } = useAppStore();
 
-  const getRoleLabel = (r: Role) => {
-    switch (r) {
-      case 'executive': return 'Executive (Dist)';
-      case 'block_officer': return 'Block Officer';
-      case 'cdpo': return 'CDPO (GP)';
-      case 'aww': return 'AWC Worker';
-      default: return r;
+  const { t } = useTranslation();
+
+  const [showNotifications, setShowNotifications] = useState(false);
+  const notifRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setShowNotifications(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  const pendingSync = syncQueue.filter(i => i.status === 'pending' || i.status === 'syncing').length;
+
+  const getSeverityIcon = (severity: string) => {
+    switch (severity) {
+      case 'critical': return <AlertCircle size={14} className="text-red-500" />;
+      case 'warning': return <AlertTriangle size={14} className="text-amber-500" />;
+      case 'success': return <CheckCircle2 size={14} className="text-emerald-500" />;
+      default: return <Info size={14} className="text-blue-500" />;
     }
   };
 
-  const formatLastSync = (time: string | null) => {
-    if (!time) return 'Never';
-    const date = new Date(time);
-    const now = new Date();
-    const diffMins = Math.floor((now.getTime() - date.getTime()) / 60000);
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins}m ago`;
-    const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return `${diffHours}h ago`;
-    return date.toLocaleDateString();
-  };
-
   return (
-    <header className="h-16 px-6 bg-white border-b border-slate-200 flex items-center justify-between sticky top-0 z-10">
-      <div className="flex items-center gap-2">
-        <h1 className="text-xl font-semibold text-slate-800 tracking-tight hidden sm:block">
-          {language === 'en' ? 'Anganwadi Monitoring System' : 
-           language === 'hi' ? 'आंगनवाड़ी निगरानी प्रणाली' : 
-           'ଅଙ୍ଗନୱାଡ଼ି ପର୍ଯ୍ୟବେକ୍ଷଣ ପ୍ରଣାଳୀ'}
+    <header className="h-16 px-4 md:px-6 bg-background/80 backdrop-blur-xl border-b border-border/80 flex items-center justify-between sticky top-0 z-10">
+      {/* Left: Page title area */}
+      <div className="flex items-center gap-3">
+        <div>
+        <h1 className="text-base md:text-lg font-semibold text-foreground tracking-tight">
+          {currentUser?.district && (
+            <span className="text-muted-foreground font-normal text-sm mr-2 hidden md:inline">
+              {currentUser.district} District ·
+            </span>
+          )}
+          {t('header.title')}
         </h1>
-        <Badge variant="outline" className="ml-2 text-indigo-600 border-indigo-200 bg-indigo-50">
-          {getRoleLabel(role)}
-        </Badge>
+        <p className="hidden md:block text-xs text-muted-foreground">{t('header.subtitle')}</p>
+        </div>
       </div>
 
-      <div className="flex items-center gap-4">
-        {/* Online/Offline Indicator */}
-        <div className="flex items-center gap-1 text-xs">
-          {isOnline ? (
-            <>
-              <Wifi size={14} className="text-emerald-500" />
-              <span className="text-emerald-600 hidden sm:inline">Online</span>
-            </>
-          ) : (
-            <>
-              <WifiOff size={14} className="text-red-500" />
-              <span className="text-red-600 hidden sm:inline">Offline</span>
-            </>
-          )}
+      {/* Right: Controls */}
+      <div className="flex items-center gap-2 md:gap-3">
+        <div className="hidden sm:flex items-center rounded-xl border border-border bg-card p-1 shadow-sm">
+          <button
+            onClick={() => setLanguage('en')}
+            className={cn(
+              'rounded-lg px-2.5 py-1 text-xs font-semibold transition-colors',
+              language === 'en' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
+            )}
+          >
+            English
+          </button>
+          <button
+            onClick={() => setLanguage('od')}
+            className={cn(
+              'rounded-lg px-2.5 py-1 text-xs font-semibold transition-colors',
+              language === 'od' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
+            )}
+          >
+            ଓଡ଼ିଆ
+          </button>
         </div>
 
+        {/* Online/Offline Toggle */}
+        <button
+          onClick={() => setOnlineStatus(!isOnline)}
+          className={cn(
+            'flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-medium transition-all duration-200 border shadow-sm',
+            isOnline
+              ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800'
+              : 'bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800'
+          )}
+        >
+          {isOnline ? <Wifi size={14} /> : <WifiOff size={14} />}
+          <span className="hidden sm:inline">{isOnline ? t('header.online') : t('header.offline')}</span>
+        </button>
+
         {/* Sync Status */}
-        {hasPendingSync && (
-          <div className="flex items-center gap-1 text-xs">
-            <RefreshCcw size={14} className="text-amber-500 animate-spin" />
-            <span className="text-amber-600 hidden sm:inline">{pendingCount} pending</span>
-          </div>
+        {pendingSync > 0 && (
+          <button
+            onClick={() => {
+              if (isOnline) processSyncQueue();
+            }}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-medium bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 transition-colors hover:bg-amber-100 dark:hover:bg-amber-950/60 shadow-sm"
+          >
+            <RefreshCcw size={14} className="animate-spin" />
+            {pendingSync} {t('header.pending')}
+          </button>
         )}
-        {lastSyncTime && !hasPendingSync && (
-          <span className="text-xs text-slate-400 hidden sm:inline">
-            {formatLastSync(lastSyncTime)}
+
+        {lastSyncTime && pendingSync === 0 && (
+          <span className="text-xs text-muted-foreground hidden md:inline">
+            {t('header.synced')} {formatRelativeTime(lastSyncTime)}
           </span>
         )}
 
-        {/* Language Selector */}
-        <Select value={language} onValueChange={(val: any) => setLanguage(val)}>
-          <SelectTrigger className="w-28 h-9">
-            <SelectValue placeholder="Lang" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="en">English</SelectItem>
-            <SelectItem value="hi">हिंदी</SelectItem>
-            <SelectItem value="od">ଓଡ଼ିଆ</SelectItem>
-          </SelectContent>
-        </Select>
-
-        {/* Role Selector */}
-        <Select value={role} onValueChange={(val: Role) => setRole(val)}>
-          <SelectTrigger className="w-[150px] h-9 hidden md:flex">
-            <SelectValue placeholder="Role" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="executive">Executive (Dist)</SelectItem>
-            <SelectItem value="block_officer">Block Officer</SelectItem>
-            <SelectItem value="cdpo">CDPO (GP)</SelectItem>
-            <SelectItem value="aww">AWC Worker</SelectItem>
-          </SelectContent>
-        </Select>
-
-        {/* Notifications */}
-        <button className="relative p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
-          <Bell size={20} />
-          <span className="absolute top-1.5 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+        {/* Theme Toggle */}
+        <button
+          onClick={toggleTheme}
+          className="p-2 rounded-xl hover:bg-accent transition-colors text-muted-foreground hover:text-foreground"
+          title={theme === 'light' ? t('header.theme_dark') : t('header.theme_light')}
+        >
+          {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
         </button>
 
+        {/* Notifications */}
+        <div className="relative" ref={notifRef}>
+          <button
+            onClick={() => setShowNotifications(!showNotifications)}
+            className="relative p-2 rounded-xl hover:bg-accent transition-colors text-muted-foreground hover:text-foreground"
+          >
+            <Bell size={18} />
+            {unreadCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse-glow">
+                {unreadCount}
+              </span>
+            )}
+          </button>
+
+          {/* Notification Dropdown */}
+          {showNotifications && (
+            <div className="absolute right-0 top-full mt-2 w-80 md:w-96 bg-card border border-border rounded-xl shadow-2xl overflow-hidden animate-scale-in z-50">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                <h3 className="font-semibold text-sm text-foreground">{t('header.notifications')}</h3>
+                <div className="flex items-center gap-2">
+                  {unreadCount > 0 && (
+                    <button
+                      onClick={markAllNotificationsRead}
+                      className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+                    >
+                      <CheckCheck size={12} /> {t('header.mark_all_read')}
+                    </button>
+                  )}
+                  <button onClick={() => setShowNotifications(false)} className="text-muted-foreground hover:text-foreground">
+                    <X size={16} />
+                  </button>
+                </div>
+              </div>
+
+              <div className="max-h-80 overflow-y-auto scrollbar-thin">
+                {notifications.length === 0 ? (
+                  <div className="p-6 text-center text-muted-foreground text-sm">{t('header.no_notifications')}</div>
+                ) : (
+                  notifications.map((notif) => (
+                    <button
+                      key={notif.id}
+                      onClick={() => markNotificationRead(notif.id)}
+                      className={cn(
+                        'w-full text-left px-4 py-3 border-b border-border/50 hover:bg-accent/50 transition-colors',
+                        !notif.read && 'bg-blue-50/50 dark:bg-blue-950/20'
+                      )}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="mt-0.5">{getSeverityIcon(notif.severity)}</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-semibold text-foreground">{notif.title}</span>
+                            {!notif.read && <span className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />}
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{notif.message}</p>
+                          <span className="text-[10px] text-muted-foreground mt-1 block">{formatRelativeTime(notif.timestamp)}</span>
+                        </div>
+                      </div>
+                    </button>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* User Avatar */}
-        <Avatar className="h-9 w-9 border border-slate-200">
-          <AvatarImage src="https://github.com/shadcn.png" />
-          <AvatarFallback>AWC</AvatarFallback>
-        </Avatar>
+        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-sky-400 via-emerald-500 to-amber-400 flex items-center justify-center text-white text-xs font-bold shadow-md">
+          {currentUser?.name?.charAt(0) || 'U'}
+        </div>
       </div>
     </header>
   );

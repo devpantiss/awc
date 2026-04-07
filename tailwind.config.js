@@ -4,8 +4,12 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -46,8 +50,13 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      animation: {
+        'fade-in': 'fadeIn 0.4s ease-out forwards',
+        'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+        'slide-right': 'slideInRight 0.4s ease-out forwards',
+        'scale-in': 'scaleIn 0.3s ease-out forwards',
+      },
     },
   },
   plugins: [],
 }
-
