@@ -38,7 +38,11 @@ export function AttendanceScannerModal({ open, onClose, childrenList, onConfirm 
     }
   }, [open, childrenList]);
 
-  if (!open) return null;
+  useEffect(() => {
+    if (!open) {
+      setStep('idle');
+    }
+  }, [open]);
 
   const handleToggle = (id: string) => {
     setAttendance((prev) => ({
@@ -55,15 +59,18 @@ export function AttendanceScannerModal({ open, onClose, childrenList, onConfirm 
   const presentCount = Object.values(attendance).filter(Boolean).length;
 
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div 
+          key="scanner-modal"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 isolate"
+        >
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-background/80 backdrop-blur-sm"
-            onClick={step === 'review' ? onClose : undefined}
+            className="absolute inset-0 bg-background/80 backdrop-blur-sm -z-10"
+            onClick={onClose}
           />
           
           <motion.div

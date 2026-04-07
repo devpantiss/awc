@@ -11,7 +11,7 @@ export function useTranslation() {
   const { language } = useAppStore();
 
   const t = useCallback((key: string, variables?: Record<string, string | number>): string => {
-    const dict = translations[language] || translations.en;
+    const dict = language === 'od' ? translations.od : translations.en;
     
     let text = dict[key] || translations.en[key] || key;
 
