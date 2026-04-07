@@ -247,6 +247,4 @@ export function SupervisorDashboard() {
     </div>
   );
 }
-    </div>
-  );
-}
+

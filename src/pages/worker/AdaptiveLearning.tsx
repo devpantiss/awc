@@ -17,7 +17,9 @@ import {
 import { PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, ResponsiveContainer } from 'recharts';
 import { average, cn, getProgressStatus } from '../../utils';
 import { useTranslation } from '../../hooks/useTranslation';
-import { TranslationKey } from '../../data/translations';
+import { mockChildren, quickAssessments, mockThemePlans, monthlyThemes, learningJourneyByTheme } from '../../data/mockData';
+import type { TranslationKey } from '../../data/translations';
+import type { MonthlyTheme, AssessmentResponse, DailyActivity } from '../../types';
 
 const responseOptions: AssessmentResponse[] = ['Yes', 'No', 'Needs Help'];
 
@@ -60,8 +62,8 @@ type ExercisePack = {
   outcomes: string[];
 };
 
-const teachingModulesByTheme: Record<MonthlyTheme, TeachingModule[]> = {
-  'My Family': [
+const teachingModulesByTheme: Record<string, TeachingModule[]> = {
+  'data.theme.family': [
     {
       id: 'family-module-1',
       title: 'Family Circle and Identity',
@@ -101,7 +103,7 @@ const teachingModulesByTheme: Record<MonthlyTheme, TeachingModule[]> = {
       materials: ['Routine cards', 'Velcro board', 'Markers'],
     },
   ],
-  Animals: [
+  'data.theme.animals': [
     {
       id: 'animal-module-1',
       title: 'Animal Habitats and Sounds',
@@ -141,7 +143,7 @@ const teachingModulesByTheme: Record<MonthlyTheme, TeachingModule[]> = {
       materials: ['Animal cards', 'Two baskets', 'Picture chart'],
     },
   ],
-  Seasons: [
+  'data.theme.seasons': [
     {
       id: 'season-module-1',
       title: 'Weather Watch and Clothing',
@@ -181,7 +183,7 @@ const teachingModulesByTheme: Record<MonthlyTheme, TeachingModule[]> = {
       materials: ['Food cards', 'Sorting mats', 'Drinking cup'],
     },
   ],
-  'Community Helpers': [
+  'data.theme.helpers': [
     {
       id: 'helper-module-1',
       title: 'Meet the Helpers',
@@ -223,8 +225,8 @@ const teachingModulesByTheme: Record<MonthlyTheme, TeachingModule[]> = {
   ],
 };
 
-const storyVideosByTheme: Record<MonthlyTheme, StoryVideo[]> = {
-  'My Family': [
+const storyVideosByTheme: Record<string, StoryVideo[]> = {
+  'data.theme.family': [
     {
       id: 'family-video-1',
       title: 'My Family, My Safe Place',
@@ -244,7 +246,7 @@ const storyVideosByTheme: Record<MonthlyTheme, StoryVideo[]> = {
       discussionPrompts: ['What work can you do at home?', 'What comes first before eating?', 'Why do we keep things clean?'],
     },
   ],
-  Animals: [
+  'data.theme.animals': [
     {
       id: 'animal-video-1',
       title: 'Where Do Animals Live?',
@@ -264,7 +266,7 @@ const storyVideosByTheme: Record<MonthlyTheme, StoryVideo[]> = {
       discussionPrompts: ['Which animals give us food?', 'Which one runs fastest?', 'Which one has wings?'],
     },
   ],
-  Seasons: [
+  'data.theme.seasons': [
     {
       id: 'season-video-1',
       title: 'The Rainy Day Song Story',
@@ -284,7 +286,7 @@ const storyVideosByTheme: Record<MonthlyTheme, StoryVideo[]> = {
       discussionPrompts: ['What do we drink in summer?', 'What do we wear in winter?', 'How is rainy weather different?'],
     },
   ],
-  'Community Helpers': [
+  'data.theme.helpers': [
     {
       id: 'helper-video-1',
       title: 'A Day with Community Helpers',
@@ -306,8 +308,8 @@ const storyVideosByTheme: Record<MonthlyTheme, StoryVideo[]> = {
   ],
 };
 
-const shapeStudioByTheme: Record<MonthlyTheme, ShapeStudioItem[]> = {
-  'My Family': [
+const shapeStudioByTheme: Record<string, ShapeStudioItem[]> = {
+  'data.theme.family': [
     {
       id: 'cube',
       name: 'Cube',
@@ -325,7 +327,7 @@ const shapeStudioByTheme: Record<MonthlyTheme, ShapeStudioItem[]> = {
       shapeClassName: 'bg-[linear-gradient(180deg,#f59e0b_0%,#fb923c_50%,#ea580c_100%)] before:bg-amber-200 after:bg-orange-700',
     },
   ],
-  Animals: [
+  'data.theme.animals': [
     {
       id: 'sphere',
       name: 'Sphere',
@@ -343,7 +345,7 @@ const shapeStudioByTheme: Record<MonthlyTheme, ShapeStudioItem[]> = {
       shapeClassName: 'bg-[linear-gradient(180deg,#fca5a5_0%,#f97316_100%)] before:hidden after:hidden',
     },
   ],
-  Seasons: [
+  'data.theme.seasons': [
     {
       id: 'cone-season',
       name: 'Cone',
@@ -361,7 +363,7 @@ const shapeStudioByTheme: Record<MonthlyTheme, ShapeStudioItem[]> = {
       shapeClassName: 'bg-[linear-gradient(135deg,#22c55e_0%,#4ade80_40%,#15803d_100%)] before:bg-green-300 after:bg-green-700',
     },
   ],
-  'Community Helpers': [
+  'data.theme.helpers': [
     {
       id: 'cylinder-helper',
       name: 'Cylinder',
@@ -381,8 +383,8 @@ const shapeStudioByTheme: Record<MonthlyTheme, ShapeStudioItem[]> = {
   ],
 };
 
-const exercisePacksByTheme: Record<MonthlyTheme, ExercisePack[]> = {
-  'My Family': [
+const exercisePacksByTheme: Record<string, ExercisePack[]> = {
+  'data.theme.family': [
     {
       id: 'family-ex-1',
       title: 'Picture to Sentence Practice',
@@ -400,7 +402,7 @@ const exercisePacksByTheme: Record<MonthlyTheme, ExercisePack[]> = {
       outcomes: ['Sequencing', 'Memory', 'Logical thinking'],
     },
   ],
-  Animals: [
+  'data.theme.animals': [
     {
       id: 'animal-ex-1',
       title: 'Habitat Matching Exercise',
@@ -418,7 +420,7 @@ const exercisePacksByTheme: Record<MonthlyTheme, ExercisePack[]> = {
       outcomes: ['Gross motor skills', 'Listening', 'Body control'],
     },
   ],
-  Seasons: [
+  'data.theme.seasons': [
     {
       id: 'season-ex-1',
       title: 'Dress for the Weather',
@@ -436,7 +438,7 @@ const exercisePacksByTheme: Record<MonthlyTheme, ExercisePack[]> = {
       outcomes: ['Nutrition awareness', 'Sorting', 'Reasoning'],
     },
   ],
-  'Community Helpers': [
+  'data.theme.helpers': [
     {
       id: 'helper-ex-1',
       title: 'Tool Matching Drill',
@@ -458,16 +460,18 @@ const exercisePacksByTheme: Record<MonthlyTheme, ExercisePack[]> = {
 
 export function AdaptiveLearning() {
   const { t } = useTranslation();
-  const [selectedTheme, setSelectedTheme] = useState<MonthlyTheme>('My Family');
-  const [selectedActivity, setSelectedActivity] = useState(learningJourneyByTheme['My Family'][0].id);
-  const [selectedModuleId, setSelectedModuleId] = useState(teachingModulesByTheme['My Family'][0].id);
+  const [selectedTheme, setSelectedTheme] = useState<MonthlyTheme>('data.theme.family');
+  const [selectedActivity, setSelectedActivity] = useState(learningJourneyByTheme['data.theme.family'][0].id);
+  const [selectedModuleId, setSelectedModuleId] = useState(teachingModulesByTheme['data.theme.family'][0].id);
 
   const themeToKey: Record<MonthlyTheme, TranslationKey> = {
-    'My Family': 'theme.family',
-    'Animals': 'theme.animals',
-    'Seasons': 'theme.seasons',
-    'Community Helpers': 'theme.helpers'
+    'data.theme.family': 'data.theme.family',
+    'data.theme.animals': 'data.theme.animals',
+    'data.theme.seasons': 'data.theme.seasons',
+    'data.theme.helpers': 'data.theme.helpers'
   };
+
+  const themeToKeyTyped = themeToKey as Record<string, TranslationKey>;
 
   const domainToKey: Record<string, TranslationKey> = {
     'Cognitive': 'domain.cognitive',
@@ -481,7 +485,7 @@ export function AdaptiveLearning() {
 
   const activities = learningJourneyByTheme[selectedTheme];
   const activity = activities.find((entry) => entry.id === selectedActivity) ?? activities[0];
-  const themePlan = themePlans.find((entry) => entry.theme === selectedTheme);
+  const themePlan = mockThemePlans.find((entry) => entry.theme === selectedTheme);
   const teachingModules = teachingModulesByTheme[selectedTheme];
   const selectedModule = teachingModules.find((module) => module.id === selectedModuleId) ?? teachingModules[0];
   const storyVideos = storyVideosByTheme[selectedTheme];
@@ -489,11 +493,11 @@ export function AdaptiveLearning() {
   const exercises = exercisePacksByTheme[selectedTheme];
 
   const radarData = useMemo(() => [
-    { domain: t('domain.cognitive'), score: average(mockChildren.map((child) => child.domainScores.cognitive)) },
-    { domain: t('domain.language'), score: average(mockChildren.map((child) => child.domainScores.language)) },
-    { domain: t('domain.physical'), score: average(mockChildren.map((child) => Math.min(100, child.attendanceRate + 2))) },
-    { domain: t('domain.social'), score: average(mockChildren.map((child) => child.domainScores.socio_emotional)) },
-    { domain: t('domain.creativity'), score: average(mockChildren.map((child) => Math.min(100, child.learningScore + 5))) },
+    { domain: t('domain.cognitive'), score: average(mockChildren.map((child: any) => child.domainScores.cognitive)) },
+    { domain: t('domain.language'), score: average(mockChildren.map((child: any) => child.domainScores.language)) },
+    { domain: t('domain.physical'), score: average(mockChildren.map((child: any) => Math.min(100, (child.attendanceRate || 0) + 2))) },
+    { domain: t('domain.social'), score: average(mockChildren.map((child: any) => child.domainScores.socio_emotional)) },
+    { domain: t('domain.creativity'), score: average(mockChildren.map((child: any) => Math.min(100, (child.learningScore || 0) + 5))) },
   ], [t]);
 
   const switchTheme = (theme: MonthlyTheme) => {
@@ -541,7 +545,7 @@ export function AdaptiveLearning() {
             <p className="text-sm text-muted-foreground">{t('learning.theme.desc')}</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            {monthlyThemes.map((theme) => (
+            {(Object.keys(monthlyThemes) as MonthlyTheme[]).map((theme) => (
               <button
                 key={theme}
                 onClick={() => switchTheme(theme)}
@@ -562,7 +566,7 @@ export function AdaptiveLearning() {
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">{themePlan.week}</p>
             <h4 className="mt-2 text-lg font-semibold text-foreground">{themePlan.focus}</h4>
             <div className="mt-3 flex flex-wrap gap-2">
-              {themePlan.activities.map((entry) => (
+              {themePlan.activities?.map((entry: string) => (
                 <span key={entry} className="rounded-full bg-sky-100 px-3 py-1 text-xs font-medium text-sky-700 dark:bg-sky-950/40 dark:text-sky-300">
                   {entry}
                 </span>
@@ -824,7 +828,7 @@ export function AdaptiveLearning() {
                 </div>
                 <p className="mt-3 text-sm text-muted-foreground">{activity.childMode}</p>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  {activity.outcomeTags.map((tag) => (
+                  {activity.outcomeTags.map((tag: string) => (
                     <span key={tag} className="rounded-full bg-sky-100 px-3 py-1 text-xs font-medium text-sky-700 dark:bg-sky-950/40 dark:text-sky-300">
                       {tag}
                     </span>
@@ -855,7 +859,7 @@ export function AdaptiveLearning() {
                   </div>
                   <p className="mt-3 text-sm text-muted-foreground">{exercise.description}</p>
                   <div className="mt-3 flex flex-wrap gap-2">
-                    {exercise.outcomes.map((outcome) => (
+                    {exercise.outcomes.map((outcome: string) => (
                       <span key={outcome} className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
                         {outcome}
                       </span>
@@ -915,7 +919,7 @@ export function AdaptiveLearning() {
               </ResponsiveContainer>
             </div>
             <div className="mt-4 space-y-3">
-              {radarData.map((entry) => (
+              {radarData.map((entry: any) => (
                 <div key={entry.domain} className="flex items-center justify-between rounded-2xl border border-border bg-background/70 px-4 py-3 text-sm">
                   <span className="font-medium text-foreground">{entry.domain}</span>
                   <span className={cn(

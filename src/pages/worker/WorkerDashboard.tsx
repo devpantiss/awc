@@ -223,7 +223,7 @@ export function WorkerDashboard() {
         {/* Right Column: AI Insights & Quick Actions */}
         <div className="space-y-6">
           <div className="rounded-[2rem] border border-border bg-card p-6 shadow-sm overflow-hidden relative">
-            <div className="absolute top-0 right-0 p-8 opacity-10">
+            <div className="pointer-events-none absolute top-0 right-0 p-8 opacity-10" aria-hidden="true">
               <Sparkles size={120} className="text-primary" />
             </div>
             <h3 className="text-xl font-semibold text-foreground flex items-center gap-2">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '../../hooks/useTranslation';
 import { mockBlocks, districtKPIs, mockInsights } from '../../data/mockData';
 import { cn, simulateAPI, formatIndianNumber, formatRelativeTime } from '../../utils';
 import { DashboardSkeleton } from '../../components/ui/loading-skeleton';
@@ -26,7 +26,7 @@ export function AdminDashboard() {
   const kpis = districtKPIs;
 
   // Chart data from blocks
-  const blockChartData = mockBlocks.map(b => ({
+  const blockChartData = mockBlocks.map((b: any) => ({
     name: b.name.length > 10 ? b.name.slice(0, 10) + '..' : b.name,
     learning: b.avgLearningScore,
     nutrition_risk: b.nutritionRiskPercent,
@@ -150,7 +150,7 @@ export function AdminDashboard() {
           {t('district.heatmap.title')}
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {mockBlocks.map((block, i) => (
+          {mockBlocks.map((block: any, i: number) => (
             <div
               key={block.id}
               className={cn(
@@ -215,7 +215,7 @@ export function AdminDashboard() {
           {t('district.insights.title')}
         </h3>
         <div className="space-y-4">
-          {mockInsights.map((insight, i) => {
+          {mockInsights.map((insight: any, i: number) => {
             const getIcon = () => {
               switch (insight.type) {
                 case 'critical': return <AlertCircle size={20} className="text-red-600 dark:text-red-400" />;

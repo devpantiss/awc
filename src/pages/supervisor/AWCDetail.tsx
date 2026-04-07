@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from '../../hooks/useTranslation';
 import { mockAWCs, mockChildren } from '../../data/mockData';
 import { cn, simulateAPI, formatAge, formatRelativeTime } from '../../utils';
 import { DashboardSkeleton } from '../../components/ui/loading-skeleton';
@@ -13,7 +14,7 @@ import {
   Phone, MapPin, Wifi, WifiOff, AlertTriangle, CheckCircle2,
 } from 'lucide-react';
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
 
 export function AWCDetail() {

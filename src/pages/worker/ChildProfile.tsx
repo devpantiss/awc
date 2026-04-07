@@ -2,21 +2,22 @@ import { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Area, AreaChart, CartesianGrid, Radar, RadarChart, PolarAngleAxis, PolarGrid, PolarRadiusAxis, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { ArrowLeft, BadgeCheck, Brain, HeartPulse, MessageSquareHeart, Ruler, Scale, Sparkles } from 'lucide-react';
-import { badgeAwards, childDevelopmentInsights, mealLogs, mockChildren, weeklyParentReports } from '../../data/mockData';
+import { mockBadgeAwards, childDevelopmentInsights, mockMealLogs, mockChildren, mockWeeklyParentReports } from '../../data/mockData';
 import { cn, formatAge, getGrowthStatus, getProgressStatus } from '../../utils';
 import { useTranslation } from '../../hooks/useTranslation';
+import type { WeeklyParentReport, ChildDevelopmentInsight, MealLog, BadgeAward } from '../../types';
 
 export function ChildProfile() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { childId } = useParams<{ childId: string }>();
-  const child = mockChildren.find((entry) => entry.id === childId) ?? null;
+  const child = mockChildren.find((entry: any) => entry.id === childId) ?? null;
 
   const latestGrowth = child?.nutritionHistory.at(-1);
-  const report = weeklyParentReports[childId as keyof typeof weeklyParentReports]?.at(0);
-  const badges = badgeAwards.filter((entry) => entry.childId === childId);
-  const insights = (childDevelopmentInsights[childId as keyof typeof childDevelopmentInsights] || []);
-  const meals = mealLogs.filter((entry) => entry.childId === childId);
+  const report = (mockWeeklyParentReports[childId as keyof typeof mockWeeklyParentReports] as WeeklyParentReport[])?.at(0);
+  const badges = mockBadgeAwards.filter((entry: BadgeAward) => entry.childId === childId);
+  const insights = (childDevelopmentInsights[childId as keyof typeof childDevelopmentInsights] as ChildDevelopmentInsight[] || []);
+  const meals = mockMealLogs.filter((entry: MealLog) => entry.childId === childId);
 
   const radarData = useMemo(() => {
     if (!child) return [];
@@ -205,7 +206,7 @@ export function ChildProfile() {
               </ResponsiveContainer>
             </div>
             <div className="mt-4 grid gap-3">
-              {radarData.map((domain) => (
+              {radarData.map((domain: { domain: string; score: number }) => (
                 <div key={domain.domain} className="rounded-2xl border border-border bg-background/70 p-3">
                   <div className="flex items-center justify-between text-sm">
                     <span className="font-medium text-foreground">{domain.domain}</span>
@@ -227,7 +228,7 @@ export function ChildProfile() {
                 <div className="rounded-3xl border border-border bg-background/70 p-4">
                   <p className="font-semibold text-foreground">{t('parents.report.home_activities')}</p>
                   <div className="mt-3 space-y-2">
-                    {report.learningHighlights.map((highlight) => (
+                    {report.learningHighlights.map((highlight: string) => (
                       <div key={highlight} className="rounded-2xl bg-card px-3 py-2 text-sm text-muted-foreground shadow-sm">
                         {t(highlight)}
                       </div>
@@ -246,13 +247,13 @@ export function ChildProfile() {
               <h2 className="text-xl font-semibold text-foreground">{t('dashboard.actions.badges')}</h2>
             </div>
             <div className="mt-4 space-y-3">
-              {badges.map((badge) => (
+              {badges.map((badge: BadgeAward) => (
                 <div key={badge.id} className="rounded-3xl border border-border bg-background/70 p-4">
                   <p className="font-semibold text-foreground">{t(badge.title)}</p>
                   <p className="mt-1 text-sm text-muted-foreground">{t(badge.description)}</p>
                 </div>
               ))}
-              {meals.map((meal) => (
+              {meals.map((meal: MealLog) => (
                 <div key={meal.id} className="rounded-3xl border border-border bg-background/70 p-4">
                   <p className="font-semibold text-foreground">{t(meal.menu)}</p>
                   <p className="mt-1 text-sm text-muted-foreground">

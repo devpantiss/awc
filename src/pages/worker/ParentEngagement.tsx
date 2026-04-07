@@ -1,11 +1,12 @@
 import { BellRing, HeartHandshake, Home, Share2 } from 'lucide-react';
-import { mockChildren, weeklyParentReports } from '../../data/mockData';
+import { mockChildren, mockWeeklyParentReports } from '../../data/mockData';
 import { cn } from '../../utils';
 import { useTranslation } from '../../hooks/useTranslation';
+import type { WeeklyParentReport } from '../../types';
 
 export function ParentEngagement() {
   const { t } = useTranslation();
-  const reports = weeklyParentReports;
+  const reports: WeeklyParentReport[] = Object.values(mockWeeklyParentReports).flat();
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -23,8 +24,8 @@ export function ParentEngagement() {
       <div className="grid gap-4 md:grid-cols-3">
         {[
           { label: t('parents.stats.families'), value: `${reports.length}/${mockChildren.length}`, icon: HeartHandshake, tone: 'emerald' },
-          { label: t('parents.stats.notifications'), value: reports.reduce((sum, report) => sum + report.notifications.length, 0), icon: BellRing, tone: 'amber' },
-          { label: t('parents.stats.home_activities'), value: reports.reduce((sum, report) => sum + report.homeActivities.length, 0), icon: Home, tone: 'sky' },
+          { label: t('parents.stats.notifications'), value: reports.reduce((sum: number, report) => sum + (report.notifications?.length || 0), 0), icon: BellRing, tone: 'amber' },
+          { label: t('parents.stats.home_activities'), value: reports.reduce((sum: number, report) => sum + (report.homeActivities?.length || 0), 0), icon: Home, tone: 'sky' },
         ].map((item) => (
           <div key={item.label} className="rounded-3xl border border-border bg-card p-5 shadow-sm">
             <div className="flex items-center justify-between">
@@ -50,7 +51,7 @@ export function ParentEngagement() {
           const child = mockChildren.find((entry) => entry.id === report.childId);
 
           return (
-            <section key={report.id} className="rounded-3xl border border-border bg-card p-6 shadow-sm">
+            <section key={report.id || Math.random()} className="rounded-3xl border border-border bg-card p-6 shadow-sm">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <h3 className="text-xl font-semibold text-foreground">{child?.name ?? t('parents.report.child_report')}</h3>
@@ -64,7 +65,8 @@ export function ParentEngagement() {
               <p className="mt-4 text-sm leading-6 text-muted-foreground">{report.summary}</p>
 
               <div className="mt-5 grid gap-4 md:grid-cols-3">
-                {Object.entries(report.progress).map(([key, value]) => {
+                {report.progress && Object.entries(report.progress).map(([key, val]) => {
+                  const value = val as number;
                   const progressKey = `progress.${key.toLowerCase()}`;
                   return (
                     <div key={key} className="rounded-2xl border border-border bg-background/70 p-4">
@@ -90,7 +92,7 @@ export function ParentEngagement() {
                 <div className="rounded-2xl border border-border bg-background/70 p-4">
                   <h4 className="font-semibold text-foreground">{t('parents.report.skills_learned')}</h4>
                   <div className="mt-3 flex flex-wrap gap-2">
-                    {report.skillsLearned.map((skill) => (
+                    {report.skillsLearned?.map((skill: string) => (
                       <span key={skill} className="rounded-full bg-sky-100 px-3 py-1 text-xs font-medium text-sky-700 dark:bg-sky-950/40 dark:text-sky-300">
                         {skill}
                       </span>
@@ -100,7 +102,7 @@ export function ParentEngagement() {
                 <div className="rounded-2xl border border-border bg-background/70 p-4">
                   <h4 className="font-semibold text-foreground">{t('parents.report.areas_improve')}</h4>
                   <div className="mt-3 flex flex-wrap gap-2">
-                    {report.areasToImprove.map((area) => (
+                    {report.areasToImprove?.map((area: string) => (
                       <span key={area} className="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-700 dark:bg-amber-950/40 dark:text-amber-300">
                         {area}
                       </span>
@@ -112,7 +114,7 @@ export function ParentEngagement() {
               <div className="mt-5 rounded-2xl border border-border bg-background/70 p-4">
                 <h4 className="font-semibold text-foreground">{t('parents.report.home_activities')}</h4>
                 <div className="mt-3 space-y-2">
-                  {report.homeActivities.map((activity) => (
+                  {report.homeActivities?.map((activity: string) => (
                     <div key={activity} className="rounded-xl bg-card px-3 py-2 text-sm text-muted-foreground shadow-sm">
                       {activity}
                     </div>
@@ -123,7 +125,7 @@ export function ParentEngagement() {
               <div className="mt-5 rounded-2xl border border-border bg-background/70 p-4">
                 <h4 className="font-semibold text-foreground">{t('parents.report.notifications')}</h4>
                 <div className="mt-3 space-y-2">
-                  {report.notifications.map((notification) => (
+                  {report.notifications?.map((notification) => (
                     <div key={notification.id} className="flex items-start gap-3 rounded-xl bg-card px-3 py-3 shadow-sm">
                       <div className="mt-0.5 rounded-full bg-primary/10 p-2 text-primary">
                         <BellRing size={14} />
@@ -143,3 +145,4 @@ export function ParentEngagement() {
     </div>
   );
 }
+

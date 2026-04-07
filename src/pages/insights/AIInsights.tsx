@@ -27,15 +27,15 @@ export function AIInsights() {
   // Get children for selected AWC
   const childrenInSelectedAWC = useMemo(() => {
     if (selectedAWC === 'all') return mockChildren;
-    return mockChildren.filter(child => child.awcId === selectedAWC);
+    return mockChildren.filter((child: any) => child.awcId === selectedAWC);
   }, [selectedAWC]);
 
   // Get child IDs for selected AWC
-  const childIdsInAWC = useMemo(() => new Set(childrenInSelectedAWC.map(c => c.id)), [childrenInSelectedAWC]);
+  const childIdsInAWC = useMemo(() => new Set(childrenInSelectedAWC.map((c: any) => c.id)), [childrenInSelectedAWC]);
 
   // Filter insights based on category and AWC
   const filteredInsights = useMemo(() => {
-    return mockInsights.filter(insight => {
+    return mockInsights.filter((insight: any) => {
       // Filter by category
       if (selectedCategory !== 'all' && insight.category !== selectedCategory) return false;
       
@@ -54,7 +54,7 @@ export function AIInsights() {
   // Filter predictions for selected AWC
   const filteredPredictions = useMemo(() => {
     if (selectedAWC === 'all') return mockPredictions;
-    return mockPredictions.filter(prediction => childIdsInAWC.has(prediction.childId));
+    return mockPredictions.filter((prediction: any) => childIdsInAWC.has(prediction.childId));
   }, [selectedAWC, childIdsInAWC]);
   
   // Get risk color classes
@@ -140,7 +140,7 @@ export function AIInsights() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-500">{language === 'en' ? 'High Risk' : language === 'hi' ? 'उच्च जोखिम' : 'ଉଚ୍ଚ ବିପଦ'}</p>
-                <p className="text-2xl font-bold text-red-600">{filteredInsights.filter(i => i.level === 'High').length}</p>
+                <p className="text-2xl font-bold text-red-600">{filteredInsights.filter((i: any) => i.level === 'High').length}</p>
               </div>
               <div className="p-2 bg-red-100 rounded-lg"><AlertTriangle className="text-red-600" size={20} /></div>
             </div>
@@ -152,7 +152,7 @@ export function AIInsights() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-500">{language === 'en' ? 'Medium Risk' : language === 'hi' ? 'मध्यम जोखिम' : 'ମଧ୍ୟମ ବିପଦ'}</p>
-                <p className="text-2xl font-bold text-amber-600">{filteredInsights.filter(i => i.level === 'Medium').length}</p>
+                <p className="text-2xl font-bold text-amber-600">{filteredInsights.filter((i: any) => i.level === 'Medium').length}</p>
               </div>
               <div className="p-2 bg-amber-100 rounded-lg"><Activity className="text-amber-600" size={20} /></div>
             </div>
@@ -207,7 +207,7 @@ export function AIInsights() {
               <SelectItem value="all">
                 {language === 'en' ? 'All Centers' : language === 'hi' ? 'सभी केंद्र' : 'ସମସ୍ତ କେନ୍ଦ୍ର'}
               </SelectItem>
-              {mockAWCs.map(awc => (
+              {mockAWCs.map((awc: any) => (
                 <SelectItem key={awc.id} value={awc.id}>
                   {awc.name}
                 </SelectItem>
@@ -219,9 +219,9 @@ export function AIInsights() {
       
       {/* Insights Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {filteredInsights.map((insight) => {
+        {filteredInsights.map((insight: any) => {
           const colors = getRiskColorClasses(insight.level);
-          const prediction = mockPredictions.find(p => p.childId === insight.targetId);
+          const prediction = mockPredictions.find((p: any) => p.childId === insight.targetId);
           
           return (
             <Card key={insight.id} className={`${colors.border} ${colors.bg} shadow-sm hover:shadow-md transition-shadow`}>
@@ -264,7 +264,7 @@ export function AIInsights() {
                       {language === 'en' ? 'Suggested Actions:' : language === 'hi' ? 'सुझाए गए कार्य:' : 'ସୁପାରିଶ କରାଯାଇଥିବା କାର୍ଯ୍ୟ:'}
                     </p>
                     <div className="flex flex-wrap gap-1">
-                      {insight.suggestedInterventions.map((intervention, i) => (
+                      {insight.suggestedInterventions.map((intervention: string, i: number) => (
                         <Badge key={i} variant="outline" className="text-xs bg-white">
                           {getInterventionLabel(intervention)}
                         </Badge>
@@ -310,14 +310,14 @@ export function AIInsights() {
             </h3>
             {selectedAWC !== 'all' && (
               <Badge variant="outline" className="text-xs">
-                {mockAWCs.find(a => a.id === selectedAWC)?.name}
+                {mockAWCs.find((a: any) => a.id === selectedAWC)?.name}
               </Badge>
             )}
           </div>
           
           <div className="grid gap-4 md:grid-cols-2">
-            {filteredPredictions.map((prediction) => {
-            const child = mockChildren.find(c => c.id === prediction.childId);
+            {filteredPredictions.map((prediction: any) => {
+            const child = mockChildren.find((c: any) => c.id === prediction.childId);
             if (!child) return null;
             
             return (
@@ -355,7 +355,7 @@ export function AIInsights() {
                   <div className="mt-4">
                     <p className="text-xs text-slate-500 mb-2">{language === 'en' ? 'Risk Factors:' : language === 'hi' ? 'जोखिम कारक:' : 'ବିପଦ କାରକ:'}</p>
                     <div className="flex flex-wrap gap-1">
-                      {prediction.riskFactors.map((factor, i) => (
+                      {prediction.riskFactors.map((factor: string, i: number) => (
                         <span key={i} className="text-xs bg-red-50 text-red-700 px-2 py-1 rounded">{factor}</span>
                       ))}
                     </div>

@@ -361,6 +361,9 @@ export const mockAIInsights: AIInsight[] = [
   { id: '4', title: 'data.insight.sync_status', value: '98%', change: '+0.5%', status: 'good' },
 ];
 
+// Preserve older imports used across the app while the data naming settles.
+export const mockInsights = mockAIInsights;
+
 export const mockNotifications: Notification[] = [
   {
     id: '1',
@@ -485,6 +488,12 @@ export const mockThemePlans: ThemePlan[] = [
     ],
     resources: ['Family flashcards', 'Audio stories', 'Crayons']
   }
+];
+
+export const mockPredictions = [
+  { childId: 'c1', currentNutritionStatus: 'Normal', predictedNutritionStatus: 'Normal', predictionConfidence: 94, daysToPrediction: 30, riskFactors: ['Stable weight'] },
+  { childId: 'c2', currentNutritionStatus: 'MAM', predictedNutritionStatus: 'Normal', predictionConfidence: 78, daysToPrediction: 45, riskFactors: ['Improved intake'] },
+  { childId: 'c3', currentNutritionStatus: 'SAM', predictedNutritionStatus: 'MAM', predictionConfidence: 65, daysToPrediction: 60, riskFactors: ['High recovery rate'] },
 ];
 
 export const mockBadgeAwards: BadgeAward[] = [

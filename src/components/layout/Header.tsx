@@ -39,7 +39,7 @@ export function Header() {
 
   const pendingSync = syncQueue.filter(i => i.status === 'pending' || i.status === 'syncing').length;
 
-  const getSeverityIcon = (severity: string) => {
+  const getSeverityIcon = (severity?: string) => {
     switch (severity) {
       case 'critical': return <AlertCircle size={14} className="text-red-500" />;
       case 'warning': return <AlertTriangle size={14} className="text-amber-500" />;
@@ -117,7 +117,7 @@ export function Header() {
 
         {lastSyncTime && pendingSync === 0 && (
           <span className="text-xs text-muted-foreground hidden md:inline">
-            {t('header.synced')} {formatRelativeTime(lastSyncTime)}
+            {t('header.synced')} {formatRelativeTime(lastSyncTime, t)}
           </span>
         )}
 
@@ -185,7 +185,7 @@ export function Header() {
                             {!notif.read && <span className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />}
                           </div>
                           <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{notif.message}</p>
-                          <span className="text-[10px] text-muted-foreground mt-1 block">{formatRelativeTime(notif.timestamp)}</span>
+                          <span className="text-[10px] text-muted-foreground mt-1 block">{formatRelativeTime(notif.timestamp ?? '', t)}</span>
                         </div>
                       </div>
                     </button>

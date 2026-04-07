@@ -10,19 +10,37 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+function formatRelativeTimeFallback(key: string, count?: number): string {
+  switch (key) {
+    case 'status.just_now':
+      return 'just now';
+    case 'status.min_ago':
+      return `${count} min ago`;
+    case 'status.hr_ago':
+      return `${count} hr ago`;
+    case 'status.day_ago':
+      return `${count} day${count === 1 ? '' : 's'} ago`;
+    default:
+      return '';
+  }
+}
+
 /** Format relative time (e.g., "5 min ago") */
-export function formatRelativeTime(timestamp: string, t: (key: string, vars?: any) => string): string {
+export function formatRelativeTime(timestamp: string, t?: (key: string, vars?: any) => string): string {
   const now = new Date();
   const date = new Date(timestamp);
+
+  if (Number.isNaN(date.getTime())) return '';
+
   const diffMs = now.getTime() - date.getTime();
   const diffMin = Math.floor(diffMs / 60000);
   const diffHrs = Math.floor(diffMin / 60);
   const diffDays = Math.floor(diffHrs / 24);
 
-  if (diffMin < 1) return t('status.just_now');
-  if (diffMin < 60) return t('status.min_ago', { count: diffMin });
-  if (diffHrs < 24) return t('status.hr_ago', { count: diffHrs });
-  if (diffDays < 7) return t('status.day_ago', { count: diffDays });
+  if (diffMin < 1) return t?.('status.just_now') ?? formatRelativeTimeFallback('status.just_now');
+  if (diffMin < 60) return t?.('status.min_ago', { count: diffMin }) ?? formatRelativeTimeFallback('status.min_ago', diffMin);
+  if (diffHrs < 24) return t?.('status.hr_ago', { count: diffHrs }) ?? formatRelativeTimeFallback('status.hr_ago', diffHrs);
+  if (diffDays < 7) return t?.('status.day_ago', { count: diffDays }) ?? formatRelativeTimeFallback('status.day_ago', diffDays);
   return date.toLocaleDateString('en-IN');
 }
 

@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { AlertTriangle, Download, HeartPulse, Soup, WifiOff } from 'lucide-react';
-import { mealLogs, mockChildren, offlineContentPacks } from '../../data/mockData';
+import { mockMealLogs, mockChildren, offlineContentPacks } from '../../data/mockData';
 import { average, cn, formatRelativeTime, getGrowthStatus } from '../../utils';
 import { useTranslation } from '../../hooks/useTranslation';
+import type { OfflineContentPack } from '../../types';
 
 const themeToKey = {
   'My World': 'theme.world',
@@ -26,7 +27,7 @@ export function HealthNutrition() {
     }));
   }, [t]);
 
-  const missedMeals = mealLogs.filter((meal) => meal.status === 'Missed').length;
+  const missedMeals = mockMealLogs.filter((meal) => meal.status === 'Missed').length;
   const underweightChildren = mockChildren.filter((child) => child.nutritionStatus !== 'Normal').length;
 
   return (
@@ -44,7 +45,7 @@ export function HealthNutrition() {
 
       <div className="grid gap-4 md:grid-cols-3">
         {[
-          { label: t('nutrition.stats.meals'), value: mealLogs.length, icon: Soup, tone: 'emerald' },
+          { label: t('nutrition.stats.meals'), value: mockMealLogs.length, icon: Soup, tone: 'emerald' },
           { label: t('nutrition.stats.underweight'), value: underweightChildren, icon: AlertTriangle, tone: 'amber' },
           { label: t('nutrition.stats.missed'), value: missedMeals, icon: HeartPulse, tone: 'red' },
         ].map((item) => (
@@ -134,12 +135,12 @@ export function HealthNutrition() {
               <h3 className="text-lg font-semibold text-foreground">{t('nutrition.offline.title')}</h3>
             </div>
             <div className="mt-4 space-y-3">
-              {offlineContentPacks.map((pack) => (
+              {offlineContentPacks.map((pack: OfflineContentPack) => (
                 <div key={pack.id} className="flex items-center justify-between rounded-2xl border border-border bg-background/70 p-4">
                   <div>
                     <p className="font-semibold text-foreground">{t(themeToKey[pack.theme as keyof typeof themeToKey] || 'theme.world')}</p>
                     <p className="text-xs text-muted-foreground">
-                      {pack.weekLabel} · {t('nutrition.offline.items', { count: pack.itemCount })}
+                      {pack.weekLabel} · {t('nutrition.offline.items', { count: pack.itemCount ?? 0 })}
                     </p>
                   </div>
                   <span className={cn(
@@ -148,7 +149,7 @@ export function HealthNutrition() {
                       ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
                       : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
                   )}>
-                    {pack.downloaded ? t('nutrition.offline.synced', { time: formatRelativeTime(pack.lastUpdated, t) }) : t('nutrition.offline.ready')}
+                    {pack.downloaded ? t('nutrition.offline.synced', { time: formatRelativeTime(pack.lastUpdated || '', t) }) : t('nutrition.offline.ready')}
                   </span>
                 </div>
               ))}
@@ -159,3 +160,4 @@ export function HealthNutrition() {
     </div>
   );
 }
+

@@ -4,13 +4,13 @@
 // ============================================================
 
 import { useState, useEffect } from 'react';
-import { mockInsights, mockChildren } from '../../data/mockData';
-import { cn, simulateAPI, formatRelativeTime } from '../../utils';
+import { mockChildren } from '../../data/mockData';
+import { cn, simulateAPI } from '../../utils';
 import { useTranslation } from '../../hooks/useTranslation';
 import { DashboardSkeleton } from '../../components/ui/loading-skeleton';
 import {
-  Brain, AlertTriangle, AlertCircle, CheckCircle2, Info,
-  ArrowRight, Lightbulb, TrendingDown, ShieldAlert,
+  Brain, AlertTriangle, AlertCircle, CheckCircle2,
+  ArrowRight, Lightbulb, TrendingDown,
 } from 'lucide-react';
 
 export function WorkerInsights() {

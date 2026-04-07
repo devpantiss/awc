@@ -11,9 +11,12 @@ import {
   ArrowRight, Filter,
 } from 'lucide-react';
 
+import { useTranslation } from '../../hooks/useTranslation';
+
 type InsightFilter = 'all' | 'critical' | 'warning' | 'success' | 'info';
 
 export function AdminInsights() {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<InsightFilter>('all');
 
@@ -102,11 +105,11 @@ export function AdminInsights() {
         {filtered.map((insight, i) => (
           <div
             key={insight.id}
-            className={cn('p-5 rounded-xl border transition-all hover:shadow-md animate-fade-in-up opacity-0', getBg(insight.type))}
+            className={cn('p-5 rounded-xl border transition-all hover:shadow-md animate-fade-in-up opacity-0', getBg(insight.type ?? 'info'))}
             style={{ animationDelay: `${i * 0.06}s`, animationFillMode: 'forwards' }}
           >
             <div className="flex items-start gap-4">
-              <div className="mt-0.5">{getIcon(insight.type)}</div>
+              <div className="mt-0.5">{getIcon(insight.type ?? 'info')}</div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
                   <h4 className="font-semibold text-foreground">{insight.title}</h4>
@@ -117,9 +120,9 @@ export function AdminInsights() {
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 font-medium">{insight.awcName}</span>
                   )}
                 </div>
-                <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">{insight.message}</p>
+                <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">{insight.message ?? ''}</p>
                 <div className="flex items-center gap-4 mt-3">
-                  <span className="text-xs text-muted-foreground">{formatRelativeTime(insight.timestamp)}</span>
+                  <span className="text-xs text-muted-foreground">{formatRelativeTime(insight.timestamp ?? '', t)}</span>
                   {insight.actionRequired && (
                     <button className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
                       Take Action <ArrowRight size={10} />

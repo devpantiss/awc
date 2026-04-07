@@ -4,7 +4,7 @@
 // ============================================================
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useAppStore } from '../../store/useAppStore';
 import type { UserRole } from '../../types';
 import { Users, Shield, Settings, Eye, EyeOff, Moon, Sun, Activity } from 'lucide-react';
@@ -25,7 +25,7 @@ export function LoginPage() {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const navigate = useNavigate();
-  const { login, theme, toggleTheme } = useAppStore();
+  const { login, theme, toggleTheme, isAuthenticated, userRole } = useAppStore();
 
   const handleQuickFill = (roleId: UserRole) => {
     const role = roles.find(r => r.id === roleId);
@@ -47,13 +47,18 @@ export function LoginPage() {
     login(finalRole);
 
     switch (finalRole) {
-      case 'worker': navigate('/worker'); break;
-      case 'supervisor': navigate('/supervisor'); break;
-      case 'admin': navigate('/admin'); break;
+      case 'worker': navigate('/worker', { replace: true }); break;
+      case 'supervisor': navigate('/supervisor', { replace: true }); break;
+      case 'admin': navigate('/admin', { replace: true }); break;
     }
   };
 
   const isDark = theme === 'dark';
+
+  if (isAuthenticated && userRole) {
+    const targetPath = userRole === 'worker' ? '/worker' : userRole === 'supervisor' ? '/supervisor' : '/admin';
+    return <Navigate to={targetPath} replace />;
+  }
 
   return (
     <div className={`min-h-screen relative flex items-center justify-center p-4 sm:p-8 font-sans transition-colors duration-300 overflow-hidden ${isDark ? 'bg-[#0f1110] text-white' : 'bg-slate-50 text-slate-900'}`}>
@@ -218,4 +223,3 @@ export function LoginPage() {
     </div>
   );
 }
-
